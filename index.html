@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Busskylt - Älgstigen</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #departures { margin-top: 20px; }
+        .departure { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Avgångar från Älgstigen</h1>
+    <div id="departures">Laddar...</div>
+
+    <script>
+        const siteId = '41321'; // Ersätt med det faktiska siteId
+        const apiUrl = `https://transport.integration.sl.se/v1/departures/${siteId}`;
+
+        async function fetchDepartures() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                displayDepartures(data);
+            } catch (error) {
+                console.error('Fel vid hämtning av avgångar:', error);
+                document.getElementById('departures').innerText = 'Kunde inte hämta avgångar.';
+            }
+        }
+
+        function displayDepartures(data) {
+            const departuresDiv = document.getElementById('departures');
+            departuresDiv.innerHTML = '';
+
+            data.departures.forEach(departure => {
+                const departureDiv = document.createElement('div');
+                departureDiv.className = 'departure';
+                departureDiv.innerText = `${departure.lineNumber} mot ${departure.destination} - Avgår om ${departure.displayTime}`;
+                departuresDiv.appendChild(departureDiv);
+            });
+        }
+
+        // Hämta avgångar vid sidladdning
+        fetchDepartures();
+
+        // Uppdatera avgångar var 30:e sekund
+        setInterval(fetchDepartures, 30000);
+    </script>
+</body>
+</html>
